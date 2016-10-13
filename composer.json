@@ -1,0 +1,14 @@
+{
+    "name": "eddy/chemicalquery",
+    "description": "app for engineers",
+    "type": "project",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "Eddy Arellanes",
+            "email": "powereddy@hotmail.es"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "require": {}
+}
