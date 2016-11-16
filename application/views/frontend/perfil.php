@@ -13,7 +13,6 @@
 		 $(document).ready(function(){
 	    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
 	     $('.modal-trigger').leanModal();
-       $('select').material_select(); 
 
 	  
   });
@@ -26,72 +25,39 @@
 
 </head>
 <body> 
- 	<?php $this->load->view('frontend/structure/header')?>
+ 	<?php $this->load->view('frontend/structure/header');
+  $this->db->where("id",$this->session->userdata('idUser'));
+  $query=$this->db->get('usuarios');
+  $perfil= $query->row();
+
+  ?>
 	<div class="row">	
 	     <div class="card col l12 m10 s12 offset-l0 offset-m1 offset-s0">
 	     	<div class="card-action col l12 s12 blue-grey darken-5 white-text text-white">
-	     		<h5 class="center col l6 m6 s12">	Administrador</h5>
-	     		<a href="#insertUserModal" class="btn-floating waves-effect waves-light red modal-trigger"><i class="material-icons right">add</i></a>
-          <div class="row">
-            <div class="col l12 offset-l0 m12 offset-m0 s12 offset-s0">
-              <a href="<?php print base_url();?>ChemicalQuery/Mensajes" ><button class="btn-large blue darken-5 waves-effect waves-blue">Mensajes:<!--<span style="position:inherit;left:3%" class="new badge"><?php print $messagesNotSeen?></span>--><b class="green darken-4"><?php print $messagesNotSeen?></b> nuevos</button></a>
-            </div>
+	     		<h5 class="center col l6 m6 s12">	Bienvenido <?php print $perfil->usuario?></h5>
+	     		  <a id="<?php print $this->session->userdata('idUser')?>" class="modal-trigger" href='#editUserModal'  onclick='check($(this).attr("id"))'>
+                          <i class='small material-icons white-text'>mode_edit</i>
+            </a>
 	     	</div>
-       
-        </div>
 	     	<div class="card-content ">
-	     		<table class=' col l12 m12 s12 responsive-table'>
-			        <thead>
-			          <tr>
-			              <th data-field='usuario'>Nombre</th>
-			              <th data-field='apellidos'>Apellidos</th>
-                    <th data-field='usuario'>Usuario</th>
-			              <th data-field='rfc'>No. de Cuenta</th>
-			              <th data-field='ocupacion'>Ocupación</th>			              
-			              <th data-field='permisos'>Permisos</th>
-			              <th></th>
-
-			          </tr>			         
-        			</thead>
-        			<tbody>
-              <?php 
-              $this->db->order_by('nombre','asc');
-              $query=$this->db->get('usuarios');
-              foreach ($query->result() as $row) {?>                              
-                  <tr>
-                    <td><?php print $row->nombre?></td>
-                    <td><?php print $row->apellidos?></td>
-                    <td><?php print $row->usuario?></td>
-                    <td><?php print $row->numeroCuenta?></td>
-                    <td><?php print $row->tipoCuenta?></td>
-                    <!--Permisos-->
-                    <td>
-                    <?php if($row->permisos=="0"){?>
-                      Administrador
-                    <?php }else if($row->permisos=="1"){?>
-                      Supervisor
-                    <?php }else{?>
-                      Usuario
-                    <?php }?>
-                      
-                    </td>                    
-                    <td></td>
-                    <td>                      
-                      <a id="<?php print $row->id?>" class="modal-trigger" href='#editUserModal'  onclick='check($(this).attr("id"))'>
-                          <i class='tiny material-icons black-text'>mode_edit</i>
-                        </a>
-                      </td>
-                      <td>
-                      <a id="<?php print $row->id?>" class="" href='#deleteUserModal'  onclick='deleteUser($(this).attr("id"))'>
-                          <i class='tiny material-icons black-text'>delete</i>
-                        </a>
-                      </td>
-                  </tr>
-              
-        				
-            			<?php }?>
-        			</tbody>
-        		</table>
+          <div class="row">
+            <div class="col l6 m6 s12">
+              <ul class="collection with-header"> 
+                  <li class="collection-header"><h4>Datos de Perfil</h4></li>                             
+                <li class="collection-item">Nombre:<?php print $perfil->nombre?></li>
+                <li class="collection-item">Apellidos:<?php print $perfil->apellidos?></li>
+                <li class="collection-item">Número de Cuenta: <?php print $perfil->numeroCuenta?></li>                
+                <li class="collection-item">Tipo de Cuenta: <?php print $perfil->tipoCuenta?>
+              </ul>
+            </div>
+	     		<div class="row">
+            <div class="col l6 m6 s12">
+             <ul class="collection with-header"> 
+              <li class="collection-item">Imagen de Perfil</li>
+             </ul>
+             <img style="width:50%;height: 50%;border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/usuarios/<?php print $perfil->imagen?>">
+            </div>
+          </div>
 	     	</div>
 				  
 			<div class="card-action col l12 s12">
@@ -134,7 +100,7 @@
                       <label for='ocupationInput'>Ocupación</label><br>
                       <input name="tipoCuenta" value="Estudiante" type="radio" id="radio1" />
                       <label for="radio1">Estudiante</label>
-                      <input name="tipoCuenta"  value="Profesor" type="radio" id="radio2" />
+                      <input name="tipoCuenta" value="Profesor" type="radio" id="radio2" />
                       <label for="radio2">Profesor</label>
                       
                   </div>
@@ -145,21 +111,11 @@
                       <label for='areaInput'>Área</label>
                   </div>-->
                 </div>
-               <!-- <div class='row'>
+                <div class='row'>
                   <div class='input-field col s12'>
                       <input id='permisosInput' name='permisos' type='number' min='0' max='2' class='validate black-text' required maxlength="4">
                       <label for='permisosInput'>Permisos</label>
                   </div>
-                </div>-->
-
-                <div class="input-field col s12">
-                  <select class="browser-default"  name="permisos">
-                    <option value="" disabled selected>Permisos</option>
-                    <option value="2">Administrador</option>
-                    <option value="1">Supervisor</option>
-                    <option value="0">Usuario</option>
-                  </select>
-                  
                 </div>
                 <div class='row'>
                   <div class='input-field col s12'>
@@ -236,7 +192,7 @@
                       <label for='ocupationInput'>Ocupación</label><br>
                       <input name="tipoCuenta" value="Estudiante" type="radio" id="radio1Edit" />
                       <label for="radio1Edit">Estudiante</label>
-                      <input name="tipoCuenta" value="Profesor" type="radio" id="radio2Edit" />
+                      <input name="tipoCuenta"  value="Profesor" type="radio" id="radio2Edit" />
                       <label for="radio2Edit">Profesor</label>
                       
                   </div>
@@ -246,30 +202,19 @@
                       <input id='areaInput' name='areaValue' type='text' class='validate black-text' required>
                       <label for='areaInput'>Área</label>
                   </div>-->
-                </div>
-                <!--<div class='row'>
-                  <div class='input-field col s12'>
-                      <input id='permisosEdit'  placeholder="Permisos"  name='permisos' type='number' min='0' max='2' class='validate black-text' required maxlength="4">
-                      <label for='permisosEdit'>Permisos</label>
-                  </div>
-                </div>-->
-                <div class="row">
-                 <div class="input-field col s12">
-                  <select class="browser-default"  name="permisos">
-                    <option value="" disabled selected>Permisos</option>
-                    <option value="2">Administrador</option>
-                    <option value="1">Supervisor</option>
-                    <option value="0">Usuario</option>
-                  </select>
-                  
-                </div>
-                </div>
+                </div>                
                 <div class='row'>
                   <div class='input-field col s12'>
                       <input id='contrasenaEdit'  placeholder="Contraseña"  name='contrasena' type='password' class='validate black-text'>
                       <label for='contrasenaEdit'>Nueva Contraseña</label>
                   </div>
                 </div>
+               <!-- <div class='row'>
+                  <div class='input-field col s12'>
+                      <input id='contrasenaEditRepeat'  placeholder="Contraseña"  name='contrasenaEditRepeat' type='password' class='validate black-text'>
+                      <label for='contrasenaEditRepeat'>Repite Contraseña</label>
+                  </div>
+                </div>-->
                 <div class='row'>
                    <label class="black-text">Agregar Imagen</label>
                    <div class="file-field input-field col s12">                 
@@ -299,58 +244,8 @@
     </div>
     </div>
   </div>
-
-
-  <div id='deleteUserModal' class="modal card col l4">
-    <div class='modal-content'>
-      <h4 class='black-text flow-text'>Eliminar Usuario</h4>
-      <p class='black-text '>¿Estás seguro de que quieres eliminar este usuario??</p>
-    </div>
-    <div class='modal-footer'>
-      <a href='#!' class='modal-action modal-close waves-effect btn-flat red darken-4 white-text'>Eliminar</a>
-      <a href='#!' class='modal-action modal-close waves-effect waves-red btn-flat' data-dismiss='modal'>Cerrar</a>
-    </div>
-  </div>
-
-  <div id='messages' class="modal card col l4">    
-    <div class='modal-content'>
-    <h4 class='black-text flow-text'>Mensajes</h4>     
-      <ul class="collapsible" data-collapsible="accordion">
-        <li>
-          <div class="collapsible-header"><i class="material-icons">email</i>Eddy<span style="position:inherit;left:6%;font-size: 0.7rem" class="new badge"></span>
-             <a href="#"><i  style="float:right" class="material-icons black-text">delete</i></a>       
-          </div>
-          <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
-       </li>      
-      </ul>
-
-    </div>
-    <div class='modal-footer'>      
-      <a href='#!' class='modal-action modal-close waves-effect waves-red btn-flat' data-dismiss='modal'>Cerrar</a>
-    </div>
-  </div>
 <script>
-  $( "#checkPasswordsInsert" ).click(function() {    
-      if($("#usuario").val()!="" && $("#nombre").val()!="" && $("#numeroCuenta").val()!="" && $("#contrasena").val()!="" && $("#permisos").val()!=""){
-        if($("#contrasena").val()==$("#contrasenaRepeat").val()){
-        
-          insertUser();   
-        }
-        else{
-           $('#errorContrasena').text('Las contraseñas no coinciden');    
-        }
-
-
-      }
-      else{
-           $('#errorContrasena').text('Llena todos los campos');    
-           $("#errorContrasena").css("display", "block");
-      }
-          //alert("Contraseñas No coinciden");
-          
-        
-  }); 
-  $( "#checkPasswordsEdit" ).click(function() {
+$( "#checkPasswordsEdit" ).click(function() {
      if($("#usuarioEdit").val()!="" && $("#nombreEdit").val()!="" && $("#numeroCuentaEdit").val()!=""  && $("#permisos").val()!=""){            
       editUser();
       }
@@ -362,41 +257,8 @@
       
   }); 
  
-  function insertUser(){
-       /*Para agregar el file ya que Ajax por seguridad no permite tomar archivos
-        XMLHttpRequest level 2 does support AJAX submittal of file inputs.*/
-       var formData = new FormData($('#insertForm')[0]);
-       formData.append('imagen', $('input[type=file]')[0].files[0]); 
-       /*Petición Ajax*/
-        $.ajax({
-        url:"<?php print base_url();?>"+"Functions/insertUser",
-        processData: false,
-        contentType: false,
-        type: 'POST',
-        async: true,
-        data:formData,
-        success: function(json){        
-          try{        
-              var obj = jQuery.parseJSON(json);            
+ 
 
-              if(obj['mensaje1']=="Hecho"){                            
-                location.reload();
-              }
-              else{
-              console.log(obj['mensaje1']);              
-              $('#errorContrasena').text(obj['mensaje1']);    
-              $("#errorContrasena").css("display", "block");
-              //$('#errorContrasena').text("Error");    
-              }
-          }
-          catch(e) {     
-             location.reload();
-          }       
-         
-          //$("#errorContrasena").html(data);
-        }
-      });
-    }
    function check(id){
        $.ajax({
         url:"<?php print base_url();?>"+"Functions/checkUser/"+id,
@@ -421,20 +283,7 @@
           else{
            $("#radio2Edit").attr('checked',""); 
           }
-         
           $("#permisosEdit").attr('value',obj['permisos']);     
-          /*
-          if(obj['permisos']=="0"){
-            permisos="Usuario";
-          }
-          if(obj['permisos']=="1"){
-            permisos="Supervisor";
-          }
-          if(obj['permisos']=="2"){
-            permisos="Administrador";
-          }
-          $("#permisosEdit").text(permisos);*/
-          
           
           //$("#editUserModal").html(obj["nombre"]);
           //$("#editUserModal").html(obj["nombre"]);
@@ -449,7 +298,7 @@
        formData.append('imagen', $('input[type=file]')[0].files[0]); 
        /*Petición Ajax*/
         $.ajax({
-        url:"<?php print base_url();?>"+"Functions/editUser",
+        url:"<?php print base_url();?>"+"Functions/editProfile",
         processData: false,
         contentType: false,
         type: 'POST',
@@ -476,15 +325,7 @@
         }
       });
     }
-  function deleteUser(id){
-       if(confirm("¿Deseas realmente eliminar este elemento?")){
-            window.location="<?php print base_url();?>Functions/deleteUser/"+id;           
-        }
-        else{
-            return false;
-        }
-
-  }
+ 
 </script>
       
 </body>

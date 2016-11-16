@@ -1,0 +1,10 @@
+-Da un Catch y no devuelve el mensaje aunque si hace bien la actualización en Insert y Update :v
+-Falta el Modal Delete
+-En Buscar Productos que no sea Case Sensitive
+
+-Evitar que se accione el evento hasta que ambas cajas estén llenas
+
+
+Progreso:
+Debo solucionar el error de las cajas y hacer el metodo que genera la url aleatoria 
+y el modelo que agregar a la base, despues mandar el correo, luego cuando se cambie el password borrar el link

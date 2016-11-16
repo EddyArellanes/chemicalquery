@@ -16,9 +16,9 @@
   <nav>
     <div class="nav-wrapper teal darken-2">
       <?php if(!$this->session->userdata('logueado')){?>   
-      <a href="<?php print base_url();?>ChemicalQuery/Inicio" class="brand-logo center">Quemical Query</a>
+      <a href="<?php print base_url();?>ChemicalQuery/Inicio" class="brand-logo " style="top:-50%;">Quemical Query</a>
       <?php }else{?>
-      <a href="<?php print base_url();?>ChemicalQuery/Inicio" class="brand-logo center">Quemical Query</a>
+      <a href="<?php print base_url();?>ChemicalQuery/Inicio" class="brand-logo " style="top:-50%;">Quemical Query</a>
       <?php }?>
       <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
       <ul class="right hide-on-med-and-down">
@@ -27,7 +27,15 @@
         <?php if($this->session->userdata('permisos')=='2'){?>
              <li><a href="<?php print base_url();?>ChemicalQuery/Administrador">Administrador</a></li>
         <?php }?>
-        <li><a href="badges.html">Contacto</a></li>
+        <li><a href="<?php print base_url();?>ChemicalQuery/Contacto">Contacto</a></li>
+           <!--Revisar datos de Usuario-->   
+        <?php if(null!=$this->session->userdata('imagen')){?>
+        <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img width="50px" height="50px" style="border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/usuarios/<?php print $this->session->userdata('imagen')?>">
+        <?php }else{?>
+         <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img width="50px" height="50px" style="border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/noimg.png">
+          <?php }?>
+        <?php print $this->session->userdata('usuario')?></a></li>
+        <!--Revisar datos de Usuario FIN-->  
         <a class="btn  red darken-4" href="<?php print base_url();?>Functions/logout">Salir</a>
         
       <?php }?> 
@@ -39,7 +47,15 @@
         <?php if($this->session->userdata('permisos')=='2'){?>
         <li><a href="<?php print base_url();?>ChemicalQuery/Administrador">Administrador</a></li>
         <?php }?>
-        <li><a href="badges.html">Contacto</a></li>
+        <li><a href="<?php print base_url();?>ChemicalQuery/Contacto">Contacto</a></li>
+           <!--Revisar datos de Usuario-->   
+        <?php if(null!=$this->session->userdata('imagen')){?>
+        <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img width="50px" height="50px" style="border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/usuarios/<?php print $this->session->userdata('imagen')?>">
+        <?php }else{?>
+         <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img width="50px" height="50px" style="border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/noimg.png">
+          <?php }?>
+        <?php print $this->session->userdata('usuario')?></a></li>
+        <!--Revisar datos de Usuario FIN-->  
         <li><a href="<?php print base_url();?>Functions/logout"><i class="material-icons">trending_flat</i>Salir</a></li>
       <?php }?> 
       </ul>

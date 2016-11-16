@@ -13,16 +13,365 @@ class CrudModel extends CI_Model {
 	}
 
 /*                                                CRUD MODEL V 0.7                                 */
-
-public function insertUser($data){
-        $this->db->update('estructura', $data);       
-        redirect(''.$config['base_url'].'QuemicalQuery/Administrador');
+  
+   
+  public function insertUser($data){
+      /*Valida Password*/
+      if(strlen($data['contrasenaToValidate']) < 6){
+        $error = "La contraseña debe tener al menos 6 caracteres";
+        $mensaje['mensaje1']=$error;            
+        }
+      /*elseif(strlen($data['contrasenaToValidate']) > 16){
+          $error = "La clave no puede tener más de 16 caracteres";
+       }*/
+       elseif (!preg_match('`[a-z]`',$data['contrasenaToValidate'])){
+          $error = "La clave debe tener al menos una letra minúscula";
+           $mensaje['mensaje1']=$error;    
+        
+       }
+       elseif (!preg_match('`[A-Z]`',$data['contrasenaToValidate'])){
+          $error = "La clave debe tener al menos una letra mayúscula";
+          $mensaje['mensaje1']=$error;    
+        
+       }
+       elseif (!preg_match('`[0-9]`',$data['contrasenaToValidate'])){
+          $error = "La clave debe tener al menos un caracter numérico";
+        
        }
        else{
-        redirect(''.$config['base_url'].'QuemicalQuery/Administrador');
+        $error="";
+       }
+      if($error==""){
+    
+        /*Toma Numero de cuenta y numero de cuenta donde exista alguno con los datos mandados*/
+        $this->db->where('numeroCuenta',$data['numeroCuenta']);           
+        $query=$this->db->get('usuarios');                        
+        $this->db->where('usuario',$data['usuario']);           
+        $query2=$this->db->get('usuarios');  
+        /*Si existe numero de cuenta devolvera por json a el html error*/
+           if($query->num_rows() != 0){
+              $mensaje['mensaje1']="Error, Número de cuenta ya existe";
+              echo json_encode ($mensaje) ; 
+              //print $mensaje['mensaje1'];
+           }
+        /*Si existe usuario devolvera por json a el html error*/         
+           else if($query2->num_rows() != 0){          
+              $mensaje['mensaje1']="Elige otro Nombre de Usuario ese ya existe";           
+              echo json_encode ($mensaje) ;
+              //print $mensaje['mensaje1'];          
+           }
+        /*Si pasa las validaciones entonces hacemos el Upload y devuelve un Mensaje que accionará un reload en la página*/
+          else{
+            $this->db->insert('usuarios', $data);  
+            $mensaje['mensaje1']="Hecho";                         
+          }
+      }
+      else{                              
+          echo json_encode ($mensaje);            
+      }
+  }
+  public function checkUser($dato){
+      $this->db->where('id',$dato['id']);
+      $query = $this->db->get('usuarios');        
+      if($query->num_rows() > 0 ){
+        return $query->row();
+  }
+  
+       
+  }
+  public function editUser($data){
+    if(isset($data['contrasenaToValidate'])){
+      /*Valida Password*/
+      if(strlen($data['contrasenaToValidate']) < 6){
+        $error = "La contraseña debe tener al menos 6 caracteres";
+        $mensaje['mensaje']=$error;            
+      }
+      /*elseif(strlen($data['contrasenaToValidate']) > 16){
+          $error = "La clave no puede tener más de 16 caracteres";
+       }*/
+       elseif (!preg_match('`[a-z]`',$data['contrasenaToValidate'])){
+          $error = "La clave debe tener al menos una letra minúscula";
+           $mensaje['mensaje']=$error;    
+        
+       }
+       elseif (!preg_match('`[A-Z]`',$data['contrasenaToValidate'])){
+          $error = "La clave debe tener al menos una letra mayúscula";
+          $mensaje['mensaje']=$error;    
+        
+       }
+       elseif (!preg_match('`[0-9]`',$data['contrasenaToValidate'])){
+          $error = "La clave debe tener al menos un caracter numérico";
+        
+       }
+       else{
+        $error="";
+       }
+      if($error==""){
+
+
+        $this->db->where('id',$data['id']);           
+        $query0=$this->db->get('usuarios');                        
+        $own=$query0->row();
+
+        $this->db->where('numeroCuenta',$data['numeroCuenta']);           
+        $query1=$this->db->get('usuarios');                        
+        $cuenta=$query1->row();
+        $this->db->where('usuario',$data['usuario']);           
+        $query2=$this->db->get('usuarios');  
+        $usuario=$query2->row();
+        $flag1=0;
+        $flag2=0;
+
+        
+          if($own->numeroCuenta==$data['numeroCuenta']){          
+            $flag1=1;
+           }
+          if($flag1!=1 && $query1->num_rows() > 0){
+            $mensaje['mensaje']="Error, Número de cuenta ya existe";
+            echo json_encode ($mensaje) ; 
+            //print $mensaje['mensaje1'];  
+           }
+           if($flag1!=1 && $query1->num_rows() <= 0){
+            $flag1=1;
+            //print $mensaje['mensaje1'];  
+           }                  
+           if($own->usuario==$data['usuario']){
+            $flag2=1;
+           }
+           if($flag2!=1 && $query2->num_rows() > 0){          
+            $mensaje['mensaje']="Elige otro Nombre de Usuario ese ya existe";           
+            echo json_encode ($mensaje) ;
+            //print $mensaje['mensaje1'];          
+           }
+            if($flag2!=1 && $query2->num_rows() <= 0){
+            $flag2=1;
+            //print $mensaje['mensaje1'];  
+           }     
+
+          if($flag1==1 && $flag2==1){
+            $this->db->where('id',$data['id']);   
+            $this->db->update('usuarios', $data);  
+            $mensaje['mensaje']="Hecho";
+
+            $this->db->where('id',$data['id']); 
+            $query=$this->db->get('usuarios');
+            $user=$query->row();
+
+            //Actualizar la sesión :v
+            if($this->session->userdata('idUser')==$data['id']){
+              $usuario_data = array(     'idUser' => $user->id,
+                                         'permisos'=>$user->permisos,
+                                         'usuario'=>$user->usuario,
+                                         'imagen'=>$user->imagen,
+                                         'logueado' => TRUE);
+              $this->session->set_userdata($usuario_data);
+            }
+            echo json_encode ($mensaje) ;
+            //echo json_encode ($mensaje) ;              
+          }
+         
+      }
+      else{                              
+          echo json_encode ($mensaje);            
+      }
+    }else{
+      $this->db->where('id',$data['id']);           
+        $query0=$this->db->get('usuarios');                        
+        $own=$query0->row();
+
+        $this->db->where('numeroCuenta',$data['numeroCuenta']);           
+        $query1=$this->db->get('usuarios');                        
+        $cuenta=$query1->row();
+        $this->db->where('usuario',$data['usuario']);           
+        $query2=$this->db->get('usuarios');  
+        $usuario=$query2->row();
+        $flag1=0;
+        $flag2=0;
+
+        
+          if($own->numeroCuenta==$data['numeroCuenta']){          
+            $flag1=1;
+           }
+          if($flag1!=1 && $query1->num_rows() > 0){
+            $mensaje['mensaje']="Error, Número de cuenta ya existe";
+            echo json_encode ($mensaje) ; 
+            //print $mensaje['mensaje1'];  
+           }
+           if($flag1!=1 && $query1->num_rows() <= 0){
+            $flag1=1;
+            //print $mensaje['mensaje1'];  
+           }                  
+           if($own->usuario==$data['usuario']){
+            $flag2=1;
+           }
+           if($flag2!=1 && $query2->num_rows() > 0){          
+            $mensaje['mensaje']="Elige otro Nombre de Usuario ese ya existe";           
+            echo json_encode ($mensaje) ;
+            //print $mensaje['mensaje1'];          
+           }
+            if($flag2!=1 && $query2->num_rows() <= 0){
+            $flag2=1;
+            //print $mensaje['mensaje1'];  
+           }     
+
+          if($flag1==1 && $flag2==1){
+            $this->db->where('id',$data['id']);   
+            $this->db->update('usuarios', $data);  
+            $mensaje['mensaje']="Hecho";
+
+            $this->db->where('id',$data['id']); 
+            $query=$this->db->get('usuarios');
+            $user=$query->row();
+
+            //Actualizar la sesión :v
+            if($this->session->userdata('idUser')==$data['id']){
+              $usuario_data = array(     'idUser' => $user->id,
+                                         'permisos'=>$user->permisos,
+                                         'usuario'=>$user->usuario,
+                                         'imagen'=>$user->imagen,
+                                         'logueado' => TRUE);
+              $this->session->set_userdata($usuario_data);
+            }
+            echo json_encode ($mensaje) ;
+            //echo json_encode ($mensaje) ;              
+          }
+
+    }
+}
+  public function deleteUser($id){
+      /*Busca el id mandado y donde esté el usuario rescata 
+      sus datos y borra la imagen si es que existe*/
+      $this->db->where('id', $id);
+      $query= $this->db->get('usuarios');
+      $data= $query->row();
+      if (file_exists('img/usuarios/'.$data->imagen)) {
+      unlink('img/usuarios/'.$data->imagen);
+      }
+      /*Ya borrada si existía la imagen borramos el usuario y volvemos a la página anterior*/
+      $this->db->where('id', $id);
+      $this->db->delete('usuarios');
+      redirect($_SERVER['HTTP_REFERER']);
+    }
+  public function insertProduct($data){
+     if($this->db->insert('productos', $data)){
+        //print_r($this->session->userdata('previousGallery'));
+        $this->session->set_flashdata('Producto Insertado');
+        redirect( 'create-profile/successful' );
+        redirect($_SERVER['HTTP_REFERER']);     
+       }
+       else{
+        //redirect(''.$config['base_url'].'administrador/CrudMenu');
+        print "Fracaso";
+       }
+  
+  }
+  public function checkProduct($dato){
+      $this->db->where('id',$dato['id']);
+      $query = $this->db->get('productos');        
+      if($query->num_rows() > 0 ){
+        return $query->row();
+      }
+  }
+public function updateProduct($data){
+       $this->db->where('id', $data['id']);     
+       
+       if($this->db->update('productos', $data)){                      
+           redirect($_SERVER['HTTP_REFERER']);
+       }                
+       else{
+        //redirect(''.$config['base_url'].'administrador/CrudMenu');
+        print "Fracaso";
        }
 }
+public function deleteProduct($id){
+      $this->db->where('id', $id);      
+      $query= $this->db->get('productos');
+      $data= $query->row();
 
+      if (!empty($data->imagen) && file_exists('img/productos/'.$data->imagen)) {
+      unlink('img/productos/'.$data->imagen);
+      }
+    
+
+      $this->db->where('id', $id);
+      $this->db->delete('productos');
+          
+      redirect($_SERVER['HTTP_REFERER']);
+    }
+/*public function checkUser($data){
+      $this->db->where('id',$data['id']);
+      $query = $this->db->get('usuarios');              
+      if($query->num_rows() > 0 ){
+        return $query->row();
+        //echo json_encode ($query) ; 
+      }
+  }*/
+public function recoverPassword($data){
+  $this->db->where('usuario',$data['usuario']);
+  $query=$this->db->get('usuarios');
+  if($query->num_rows()>0){
+  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  $data['contrasenaRecover']=substr(str_shuffle($characters), 0,20 );
+  $this->db->where('usuario',$data['usuario']);
+  $this->db->update('usuarios',$data); 
+  }
+}
+public function getLinkRecover($data){
+  $this->db->where('usuario',$data['usuario']);
+  $query=$this->db->get('usuarios');
+  if($query->num_rows()>0){
+  return $query;  
+  }
+
+  
+}
+public function renewPassword($data){
+  $update=array('contrasena'=>$data['contrasena'],
+                'contrasenaRecover'=>""
+                );
+  $this->db->where('contrasenaRecover ',$data['contrasenaRecover']);
+  $data['contrasenaRecover']="";
+  
+
+  if($this->db->update('usuarios',$update)){
+   
+  }
+  else{
+    print "Fracaso";
+  }
+}  
+  
+public function sendMessage($data){
+  if($query=$this->db->insert('mensajes',$data)){
+    $done= true;
+  }
+  else{
+    $done= false;
+  }
+  return $done;
+
+} 
+public function getMessages(){
+  $this->db->order_by('fecha','desc');
+  $messages= $this->db->get('mensajes');  
+  return $messages;
+} 
+public function countMessagesNotSeen(){
+  $this->db->where('visto','0');
+  $query=$this->db->get('mensajes');
+  $result=$query->num_rows();
+  return $result;
+}
+public function statusMessagesOn(){
+  $data=array('visto'=>1
+              );
+  $this->db->update('mensajes',$data);
+}   
+public function deleteMessage($data){
+ $this->db->where('id',$data['id']);
+ $this->db->delete('mensajes');
+}         
+     
 public function insertSchema($schema,$seccion,$subseccion){
        $this->db->set('esquema', $schema);
        $this->db->set('seccion', $seccion);
@@ -348,57 +697,8 @@ public function deleteSubCategory($id){
       $previousPage = $this->session->userdata('previousPage');    
       //redirect(''.$previousPage,'refresh');
     }
-public function insertProduct($data){
-     if($this->db->insert('productos', $data)){
-        //print_r($this->session->userdata('previousGallery'));
-        $previousPage = $this->session->userdata('previousPage');        
-        redirect(''.$previousPage,'refresh');     
-       }
-       else{
-        //redirect(''.$config['base_url'].'administrador/CrudMenu');
-        print "Fracaso";
-       }
-  
-}
 
-public function checkProduct($dato){
-      $this->db->where('id',$dato['id']);
-      $query = $this->db->get('productos');        
-      if($query->num_rows() > 0 ){
-        return $query->row();
-      }
-  }
-public function updateProduct($data){
-       $this->db->where('id', $data['id']);     
-       
-       if($this->db->update('productos', $data)){            
-           $previousPage = $this->session->userdata('previousPage');     
-           //print_r($data);
-           redirect(''.$previousPage,'refresh');   
-       }      
-          
-       else{
-        //redirect(''.$config['base_url'].'administrador/CrudMenu');
-        print "Fracaso";
-       }
-}
-public function deleteProduct($id){
-      $this->db->where('id', $id);      
-      $query= $this->db->get('productos');
-      $data= $query->row();
 
-      if (!empty($data->imagen) && file_exists('img/productos/'.$data->imagen)) {
-      unlink('img/productos/'.$data->imagen);
-      }
-    
-
-      $this->db->where('id', $id);
-      $this->db->delete('productos');
-      
-     
-      $previousPage = $this->session->userdata('previousPage');    
-      redirect(''.$previousPage,'refresh');
-    }
 
 
 

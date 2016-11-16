@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head>
 
+<head>
+<title>Chemical Query</title>
 	<?php $this->load->view('frontend/structure/head');?>
 
 
@@ -36,7 +37,7 @@
 				      </div>
 			    </form>
 		    <div class="card-action">
-              <a href="#">Olvide mi password</a>
+              <a href="<?php print base_url();?>RecuperarPassword/Recuperar">Olvide mi Contraseña</a>
             </div>
 	    </div>
 	  	</div>

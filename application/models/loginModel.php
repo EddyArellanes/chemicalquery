@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class loginModel extends CI_Model {
+class LoginModel extends CI_Model {
 
 	public function __construct()
 	{
@@ -16,14 +16,18 @@ class loginModel extends CI_Model {
         foreach ($query_user->result() as $row){
         	       $id = $row->id;
         	       $contrasena = $row->contrasena;
+                   $usuario= $row->usuario;
                    $permisos= $row->permisos;
+                   $imagen= $row->imagen;
         }
 
         if($query_user->num_rows()>0){
         	if($this->password->is_valid_password($datos['contrasena'], $contrasena)){
         		$usuario_data = array('idUser' => $id,
                                    'permisos'=>$permisos,
-                                  'logueado' => TRUE);
+                                   'usuario'=>$usuario,
+                                   'imagen'=>$imagen,
+                                   'logueado' => TRUE);
 				$this->session->set_userdata($usuario_data);
 
                 

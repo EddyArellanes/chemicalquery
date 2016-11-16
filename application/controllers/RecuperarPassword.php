@@ -1,57 +1,19 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-class ChemicalQuery extends CI_Controller {
+class RecuperarPassword extends CI_Controller {
 public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('actualizar_model');
 		$this->load->model('CrudModel');
-
-		if(!$this->session->userdata('logueado')){
-			redirect('','refresh');
-		}
 	}
 
-	
-	
-	public function Inicio(){
-		$this->load->view('frontend/inicio');
+		
+	public function Recuperar(){
+		$this->load->view('frontend/recuperarPassword');
 	}
-	public function Administrador(){		
-		if($this->session->userdata('permisos')=="2"){
-			$messagesNotSeen['messagesNotSeen']=$this->CrudModel->countMessagesNotSeen();
-			$this->load->view('frontend/administrador',$messagesNotSeen);			
-		}
-		else{
-			redirect('ChemicalQuery/Inicio','refresh');
-		}
+	public function RecuperarGracias(){
+		$this->load->view('frontend/recuperarGracias');
 	}
-	public function Productos(){
-		$this->load->view('frontend/productos');
-	}
-	public function Producto(){
-		$this->load->view('frontend/producto');
-	}
-	public function Perfil(){
-		$this->load->view('frontend/perfil');
-	}
-	public function Contacto(){
-		$this->load->view('frontend/contacto');
-	}
-	public function Gracias(){		
-		$this->load->view('frontend/gracias');
-	}
-	public function Mensajes(){		
-		$messages['messages']=$this->CrudModel->getMessages();
-		//Ya que han sido vistos, se cambian a vistos SOLUCIÓN TEMPORAL
-		$this->CrudModel->statusMessagesOn();	
-		//	
-		$this->load->view('frontend/mensajes',$messages);
-	}
-	public function RecuperarPassword(){
-		$this->load->view('frontend/RecuperarPassword');
-	}
-	
 	public function formContacto(){
 		/*if($this->input->post('check')==""){
 

@@ -30,7 +30,7 @@
 	<div class="row">	
 	     <div class="card col s12 l12 m12 offset-0  offset-m0  offset-s0">
 	     	<div class="card-action col l12 s12 teal darken-4 white-text text-white">
-	     		 <a style="color:white;" href="<?php print base_url();?>ChemicalQuery/Productos"><h5 class="center col l4 m4 s12"> Productos</h5></a>
+	     		  <a style="color:white;" href="<?php print base_url();?>ChemicalQuery/Productos"><h5 class="center col l4 m4 s12"> Productos</h5></a>
            <div class="input-field col l4 m4 s12">
            <form method="POST" action="<?php print base_url();?>Functions/categoryProduct">
             <select name="categoria" onchange="this.form.submit()">
@@ -56,7 +56,7 @@
             </form>
           </div>
 	     		<?php if($this->session->userdata('permisos')=='1' || $this->session->userdata('permisos')=='2'){?>
-          <a href="#insertProductModal" onclick="insert()" class="btn-floating waves-effect waves-light red modal-trigger"><i class="material-icons right">add</i></a>
+          <a href="#insertProductModal"  onclick="insert()" class="btn-floating waves-effect waves-light red modal-trigger"><i class="material-icons right">add</i></a>
           <?php }?>
 	     	</div>
 	     	<div class="card-content ">
@@ -82,7 +82,7 @@
                         $query=$this->db->get('productos');               
                     }
                     else{
-                    $this->db->order_by('nombre','asc');
+                    $this->db->where('id',$this->uri->segment(3));                      
                     $query=$this->db->get('productos');
                     }
                     if($query->num_rows()==0){?>
@@ -95,7 +95,7 @@
                     foreach ($query->result() as $row) {
 
             ?>
-            <div class="col l4 s12 m6">
+            <div class="col l8 offset-l2 s12 m12">
                
                   <div class="card">
                     <div class="card-image">
@@ -105,23 +105,22 @@
                        $("#title").removeClass("black-text");
                        $("#editButton").removeClass("black-text");
                        $("#deleteButton").removeClass("black-text");
-                       $("#title").addClass("whote-text");
                        $("#editButton").addClass("white-text");
                        $("#deleteButton").addClass("white-text");
                      });
                       </script>
-                      <a href="<?php print base_url();?>ChemicalQuery/Producto/<?php print $row->id?>"><img class="responsive-img" src="<?php print base_url();?>img/productos/<?php print $row->imagen?>"></a>
+                      <img class="responsive-img" src="<?php print base_url();?>img/productos/<?php print $row->imagen?>">                     
                     <?php }else{?>
-                       <a href="<?php print base_url();?>ChemicalQuery/Producto/<?php print $row->id?>"> <img class="responsive-img" src="<?php print base_url();?>img/noimg.png"></a>
+                      <img class="responsive-img" src="<?php print base_url();?>img/noimg.png">
 
                     <?php }?>
-                      <span id="title" class="card-title black-text"><?php print $row->nombre?>
+                      <span id="title" class="card-title black-text"><h1><?php print $row->nombre?></h1>
                         <?php if($this->session->userdata('permisos')=='1' || $this->session->userdata('permisos')=='2'){?>
                         <a id="<?php print $row->id?>" class="modal-trigger" href='#editProductModal'  onclick='check($(this).attr("id"))'>
-                          <i id="editButton" class='tiny material-icons black-text'>mode_edit</i>
+                          <i id="editButton" class='small material-icons black-text'>mode_edit</i>
                         </a>
                        <a id="<?php print $row->id?>" class="" href='#'  onclick='deleteProduct($(this).attr("id"))'>
-                          <i id="deleteButton" class='tiny material-icons black-text'>delete</i>
+                          <i id="deleteButton" class='small material-icons black-text'>delete</i>
                         </a>
                         <?php }?>
                       </span>
@@ -177,7 +176,7 @@
   <!--FORMULARIOS-->
   <div id='insertProductModal' class='col l6 modal modal-fixed-footer'>
         <div class='modal-content'>
-          <h4 class='black-text flow-text'>Insertar Producto</h4>          
+          <h4 class='black-text flow-text'>Insertar Usuario</h4>          
             <div class='row'>
               <form class='col l12 m12 s12' id='insertProducts' method="POST" action="<?php print base_url();?>Functions/insertProduct" enctype="multipart/form-data" >
                     <div class='input-field col s12'>
@@ -313,7 +312,7 @@
     </div>  
   </div>
 <script>
-   function insert(){
+    function insert(){
        tinymce.init({selector:'textarea#descripcion'});
        tinymce.init({selector:'textarea#fisicas'});
        tinymce.init({selector:'textarea#quimicas'});
@@ -346,15 +345,27 @@
           //tinymce.execCommand('mceAddEditor',true,'descripcionEdit');         
 
           tinymce.init({selector:'textarea#descripcionEdit'});
+tinymce.init({selector:'textarea#fisicasEdit'});
+tinymce.init({selector:'textarea#quimicasEdit'});
+ tinymce.init({selector:'textarea#termodinamicasEdit'});
           tinymce.activeEditor.setContent(obj['descripcion']);
           
-          tinymce.init({selector:'textarea#fisicasEdit'});
+           tinymce.init({selector:'textarea#descripcionEdit'});
+tinymce.init({selector:'textarea#fisicasEdit'});
+tinymce.init({selector:'textarea#quimicasEdit'});
+ tinymce.init({selector:'textarea#termodinamicasEdit'});
           tinymce.activeEditor.setContent(obj['fisicas']);
 
-          tinymce.init({selector:'textarea#quimicasEdit'});
+           tinymce.init({selector:'textarea#descripcionEdit'});
+tinymce.init({selector:'textarea#fisicasEdit'});
+tinymce.init({selector:'textarea#quimicasEdit'});
+ tinymce.init({selector:'textarea#termodinamicasEdit'});
           tinymce.activeEditor.setContent(obj['quimicas']);          
 
-          tinymce.init({selector:'textarea#termodinamicasEdit'});
+          tinymce.init({selector:'textarea#descripcionEdit'});
+tinymce.init({selector:'textarea#fisicasEdit'});
+tinymce.init({selector:'textarea#quimicasEdit'});
+ tinymce.init({selector:'textarea#termodinamicasEdit'});
           tinymce.activeEditor.setContent(obj['termodinamicas']);
 
           $("#imagenEdit").attr('src','<?php print base_url();?>img/productos/'+obj['imagen']);

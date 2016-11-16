@@ -8,8 +8,13 @@ class Welcome extends CI_Controller {
 		parent::__construct();		
 	}
 	public function index(){
+		if($this->session->userdata('logueado')){
+		redirect('ChemicalQuery/Inicio');	
+		}
+		else{
 		$this->load->model('actualizar_model');
 		$this->load->view('frontend/main');
+		}
 		
 	}
 }
