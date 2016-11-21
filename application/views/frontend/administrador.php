@@ -27,6 +27,7 @@
 </head>
 <body> 
  	<?php $this->load->view('frontend/structure/header')?>
+  <?php $this->load->view('frontend/structure/mensajeConfirmacion')?>
 	<div class="row">	
 	     <div class="card col l12 m10 s12 offset-l0 offset-m1 offset-s0">
 	     	<div class="card-action col l12 s12 blue-grey darken-5 white-text text-white">
@@ -67,11 +68,11 @@
                     <!--Permisos-->
                     <td>
                     <?php if($row->permisos=="0"){?>
-                      Administrador
+                      Usuario
                     <?php }else if($row->permisos=="1"){?>
                       Supervisor
                     <?php }else{?>
-                      Usuario
+                      Administrador
                     <?php }?>
                       
                     </td>                    
@@ -379,8 +380,9 @@
           try{        
               var obj = jQuery.parseJSON(json);            
 
-              if(obj['mensaje1']=="Hecho"){                            
-                location.reload();
+              if(obj['mensaje1']=="Hecho"){                       
+              alert("Usuario Agregado con éxito");     
+                setTimeout(function(){ location.reload();}, 1500);
               }
               else{
               console.log(obj['mensaje1']);              
@@ -390,7 +392,8 @@
               }
           }
           catch(e) {     
-             location.reload();
+            
+             setTimeout(function(){ window.location="<?php print base_url();?>Functions/refreshFunction/"}, 1500);
           }       
          
           //$("#errorContrasena").html(data);
@@ -458,7 +461,8 @@
         success: function(json){        
           try{        
               var obj = jQuery.parseJSON(json);                         
-              if(obj['mensaje']=="Hecho"){                     
+              if(obj['mensaje']=="Hecho"){  
+               $('#editUserModal').modal('close');                   
                 location.reload();
               }
               else{
@@ -469,7 +473,12 @@
 
 
           }catch(e) {     
-              location.reload();
+             $(document).ready(function(){
+                // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+                
+                 setTimeout(function(){ window.location="<?php print base_url();?>Functions/refreshFunction/"}, 1500);
+                 
+            });
           }       
          
           //$("#errorContrasena").html(data);
@@ -477,8 +486,9 @@
       });
     }
   function deleteUser(id){
-       if(confirm("¿Deseas realmente eliminar este elemento?")){
-            window.location="<?php print base_url();?>Functions/deleteUser/"+id;           
+       if(confirm("¿Deseas realmente eliminar este elemento?")){            
+            window.location="<?php print base_url();?>Functions/deleteUser/"+id;
+            
         }
         else{
             return false;

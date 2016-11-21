@@ -28,7 +28,8 @@
 	<div class="row">	
 	     <div class="card col l10 m10 s12 offset-l1 offset-m1 offset-s0">
 	     	<div class="card-action col l12 s12 blue-grey darken-5 white-text text-white">
-	     		<h5 class="center">	Bienvenido :D</h5>	     		
+	     		<h5 class="center">	Bienvenido!</h5>	     		
+          <p>Navega por el sitio en busca de los productos de Ingeniería en Alimentos que te interesan, si tienes alguna duda o sugerencias, no lo pienses dos veces y pasa a nuestra sección de contacto.</p>
 	     	</div>
 	     	<div class="card-content ">
 	     		

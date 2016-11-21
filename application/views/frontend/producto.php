@@ -26,6 +26,7 @@
 </head>
 <body> 
   <?php $this->load->view('frontend/structure/header')?> 
+  <?php $this->load->view('frontend/structure/mensajeConfirmacion')?>
  	
 	<div class="row">	
 	     <div class="card col s12 l12 m12 offset-0  offset-m0  offset-s0">

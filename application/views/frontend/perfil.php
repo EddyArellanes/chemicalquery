@@ -26,6 +26,7 @@
 </head>
 <body> 
  	<?php $this->load->view('frontend/structure/header');
+        $this->load->view('frontend/structure/mensajeConfirmacion');
   $this->db->where("id",$this->session->userdata('idUser'));
   $query=$this->db->get('usuarios');
   $perfil= $query->row();
@@ -55,7 +56,12 @@
              <ul class="collection with-header"> 
               <li class="collection-item">Imagen de Perfil</li>
              </ul>
+             <?php if($perfil->imagen!="" &&  file_exists(FCPATH."img/usuarios/$perfil->imagen")){ ?>
+
              <img style="width:50%;height: 50%;border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/usuarios/<?php print $perfil->imagen?>">
+             <?php }else{?>
+              <img style="width:50%;height: 50%;border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/noimg.png">
+              <?php }?>
             </div>
           </div>
 	     	</div>
@@ -318,7 +324,7 @@ $( "#checkPasswordsEdit" ).click(function() {
 
 
           }catch(e) {     
-              location.reload();
+               setTimeout(function(){ window.location="<?php print base_url();?>Functions/refreshFunction2/"}, 1500);
           }       
          
           //$("#errorContrasena").html(data);

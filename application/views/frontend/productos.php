@@ -26,13 +26,15 @@
 </head>
 <body> 
   <?php $this->load->view('frontend/structure/header')?> 
- 	
-	<div class="row">	
-	     <div class="card col s12 l12 m12 offset-0  offset-m0  offset-s0">
-	     	<div class="card-action col l12 s12 teal darken-4 white-text text-white">
-	     		 <a style="color:white;" href="<?php print base_url();?>ChemicalQuery/Productos"><h5 class="center col l4 m4 s12"> Productos</h5></a>
+  <?php $this->load->view('frontend/structure/mensajeConfirmacion')?>
+
+
+  <div class="row"> 
+       <div class="card col s12 l12 m12 offset-0  offset-m0  offset-s0">
+        <div class="card-action col l12 s12 teal darken-4 white-text text-white">
+           <a style="color:white;" href="<?php print base_url();?>ChemicalQuery/Productos"><h5 class="center col l4 m4 s12"> Productos</h5></a>
            <div class="input-field col l4 m4 s12">
-           <form method="POST" action="<?php print base_url();?>Functions/categoryProduct">
+           <form method="POST" action="<?php print base_url();?>Functions/categoryProduct/Categorias">
             <select name="categoria" onchange="this.form.submit()">
               <?php              
               $this->db->order_by('nombre','asc');
@@ -49,66 +51,53 @@
             
           </div>
            <div class="input-field col l2 m12 s12">
-            <form method="POST" action="<?php print base_url();?>Functions/searchProduct">
+            <form method="POST" action="<?php print base_url();?>Functions/searchProduct/Busqueda">
               <i class="material-icons prefix">search</i>             
               <input id='search' name='search' type='text' class='validate white-text' required>
               <label for="search">Buscar</label>
             </form>
           </div>
-	     		<?php if($this->session->userdata('permisos')=='1' || $this->session->userdata('permisos')=='2'){?>
+          <?php if($this->session->userdata('permisos')=='1' || $this->session->userdata('permisos')=='2'){?>
           <a href="#insertProductModal" onclick="insert()" class="btn-floating waves-effect waves-light red modal-trigger"><i class="material-icons right">add</i></a>
           <?php }?>
-	     	</div>
-	     	<div class="card-content ">
-	     		<div class="row">
-            <?php 
-                    if($this->uri->segment(3)=="Categoria"){                   
-                        $this->db->where('categoria',$this->uri->segment(4));
-                        $this->db->order_by('nombre','asc');
-                        $query=$this->db->get('productos');
-                        
-                        
-                    }
-                    elseif ($this->uri->segment(3)=="Buscar") {
-                       // $this->db->like('nombre',$this->uri->segment(4));
-                        //$this->db->like('descripcion',$this->uri->segment(4));
-                      /* LIKE OR LIKE */
-                        $this->db->or_like(array('nombre' =>$this->uri->segment(4) ,
-                         'descripcion' => $this->uri->segment(4),
-                         'fisicas'=>$this->uri->segment(4),
-                         'quimicas'=>$this->uri->segment(4),
-                         'termodinamicas'=>$this->uri->segment(4)));
-                        $this->db->order_by('nombre','asc');
-                        $query=$this->db->get('productos');               
-                    }
-                    else{
-                    $this->db->order_by('nombre','asc');
-                    $query=$this->db->get('productos');
-                    }
-                    if($query->num_rows()==0){?>
-                       <div class="col l12 s12 m12">
+        </div>
+        <div class="card-content ">
+          <div class="row">
+            <?php                 
+                if($this->uri->segment(3)=="Categorias"){
+                $products=$category;
+
+                }
+                elseif($this->uri->segment(3)=="Busqueda"){
+                   if(isset($product)){
+                    $products= $product;                                    
+                    }                  
+                    if(isset($empty) && $empty=="Vacio"){
+                        $action=true;
+                    ?>                   
+                      <div class="col l12 s12 m12">
                            <div class="card">
                             <h3 class="center">NINGÚN PRODUCTO ENCONTRADO</h3>
                             </div>
                        </div>
-                    <?php }else{
-                    foreach ($query->result() as $row) {
+                    <?php }
 
-            ?>
+                  }
+                  elseif($this->uri->segment(2)=="insertProduct" || $this->uri->segment(2)=="updateProduct" || $this->uri->segment(2)=="deleteProduct" || $this->uri->segment(3)==""){
+                    $products=$allProducts;
+                  }?>
+                <?php if(isset($products)){
+                      foreach ($products->result() as $row) {
+                ?>
+
+            
             <div class="col l4 s12 m6">
                
                   <div class="card">
                     <div class="card-image">
                     <?php if($row->imagen!="" && file_exists(FCPATH."img/productos/$row->imagen")){?>
                        <script>
-                       $(document).ready(function() {
-                       $("#title").removeClass("black-text");
-                       $("#editButton").removeClass("black-text");
-                       $("#deleteButton").removeClass("black-text");
-                       $("#title").addClass("whote-text");
-                       $("#editButton").addClass("white-text");
-                       $("#deleteButton").addClass("white-text");
-                     });
+                     
                       </script>
                       <a href="<?php print base_url();?>ChemicalQuery/Producto/<?php print $row->id?>"><img class="responsive-img" src="<?php print base_url();?>img/productos/<?php print $row->imagen?>"></a>
                     <?php }else{?>
@@ -166,13 +155,13 @@
 
                    
                 </div>
-	     	</div>
-				  
-			<div class="card-action col l12 s12">
-	              <a href="#"></a>
-	        </div>
-	   	 	
-	  	</div>
+        </div>
+          
+      <div class="card-action col l12 s12">
+                <a href="#"></a>
+          </div>
+        
+      </div>
   </div>
   <!--FORMULARIOS-->
   <div id='insertProductModal' class='col l6 modal modal-fixed-footer'>

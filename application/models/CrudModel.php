@@ -3,38 +3,103 @@
 
 class CrudModel extends CI_Model {
 
-	public function __construct()
-	{
-		parent::__construct();
+  public function __construct()
+  {
+    parent::__construct();
         $db_admin = $this->load->database('default', TRUE);
         $this->load->library('session');
 
         
-	}
+  }
 
 /*                                                CRUD MODEL V 0.7                                 */
-  
-   
-  public function insertUser($data){
+  public function allProducts(){
+    $this->db->order_by('nombre','asc');
+    $query=$this->db->get('productos');
+    return $query;
+
+  }
+  public function findCategory($category){
+    $this->db->order_by('nombre','asc');
+    $this->db->where('categoria',$category);
+    $query= $this->db->get('productos');
+    return $query;
+  }
+  public function findProduct($product){    
+    $this->db->like('nombre',$product,null);
+    $this->db->order_by('nombre','asc');
+    $query=$this->db->get('productos');
+
+    if($query->num_rows()>0){
+      return $query;
+    }
+    else{
+      $this->db->like('nombre',$product);
+      $this->db->order_by('nombre','asc');
+      $query=$this->db->get('productos');
+
+      if($query->num_rows()>0){
+        return $query;
+      }
+      //Búsqueda por Descripción
+      else{
+        $this->db->where("MATCH (descripcion) AGAINST ('".$product."' IN NATURAL LANGUAGE MODE)",NULL,FALSE);
+        $this->db->order_by('nombre','asc');
+        $query=$this->db->get('productos');
+        if($query->num_rows()>0){
+            return $query;
+        }
+        //Búsqueda por Propiedades Físicas
+        else{
+          $this->db->where("MATCH (fisicas) AGAINST ('".$product."' IN NATURAL LANGUAGE MODE)",NULL,FALSE);
+          $this->db->order_by('nombre','asc');
+          $query=$this->db->get('productos');
+          if($query->num_rows()>0){
+              return $query;
+          }
+          //Búsqueda por Propiedades Quimicas
+          else{
+            $this->db->where("MATCH (quimicas) AGAINST ('".$product."' IN NATURAL LANGUAGE MODE)",NULL,FALSE);
+            $this->db->order_by('nombre','asc');
+            $query=$this->db->get('productos');
+            if($query->num_rows()>0){
+              return $query;
+            }
+            //Búsqueda por Propiedades Termodinámicas
+            else{
+              $this->db->where("MATCH (termodinamicas) AGAINST ('".$product."' IN NATURAL LANGUAGE MODE)",NULL,FALSE);
+              $this->db->order_by('nombre','asc');
+              $query=$this->db->get('productos');
+              if($query->num_rows()>0){
+                return $query;
+              }
+            }//Termodinámicas
+          }//Quimicas
+        }//Fisicas
+      }//Descripción
+    }//Nombre con Wildcards    
+
+  }
+  public function insertUser($data,$passwordToValidate){
       /*Valida Password*/
-      if(strlen($data['contrasenaToValidate']) < 6){
+      if(strlen($passwordToValidate['contrasenaToValidate']) < 6){
         $error = "La contraseña debe tener al menos 6 caracteres";
         $mensaje['mensaje1']=$error;            
         }
-      /*elseif(strlen($data['contrasenaToValidate']) > 16){
+      /*elseif(strlen($passwordToValidate['contrasenaToValidate']) > 16){
           $error = "La clave no puede tener más de 16 caracteres";
        }*/
-       elseif (!preg_match('`[a-z]`',$data['contrasenaToValidate'])){
+       elseif (!preg_match('`[a-z]`',$passwordToValidate['contrasenaToValidate'])){
           $error = "La clave debe tener al menos una letra minúscula";
            $mensaje['mensaje1']=$error;    
         
        }
-       elseif (!preg_match('`[A-Z]`',$data['contrasenaToValidate'])){
+       elseif (!preg_match('`[A-Z]`',$passwordToValidate['contrasenaToValidate'])){
           $error = "La clave debe tener al menos una letra mayúscula";
           $mensaje['mensaje1']=$error;    
         
        }
-       elseif (!preg_match('`[0-9]`',$data['contrasenaToValidate'])){
+       elseif (!preg_match('`[0-9]`',$passwordToValidate['contrasenaToValidate'])){
           $error = "La clave debe tener al menos un caracter numérico";
         
        }
@@ -64,9 +129,11 @@ class CrudModel extends CI_Model {
           else{
             $this->db->insert('usuarios', $data);  
             $mensaje['mensaje1']="Hecho";                         
+            $this->session->set_userdata('message', "Usuario añadido correctamente");                       
           }
       }
       else{                              
+
           echo json_encode ($mensaje);            
       }
   }
@@ -152,7 +219,7 @@ class CrudModel extends CI_Model {
             $this->db->where('id',$data['id']);   
             $this->db->update('usuarios', $data);  
             $mensaje['mensaje']="Hecho";
-
+             $mensaje['mensaje2']="Usuario Actualizado con éxito";
             $this->db->where('id',$data['id']); 
             $query=$this->db->get('usuarios');
             $user=$query->row();
@@ -218,7 +285,7 @@ class CrudModel extends CI_Model {
             $this->db->where('id',$data['id']);   
             $this->db->update('usuarios', $data);  
             $mensaje['mensaje']="Hecho";
-
+            $this->session->set_userdata('message', "Usuario actualizado correctamente");                       
             $this->db->where('id',$data['id']); 
             $query=$this->db->get('usuarios');
             $user=$query->row();
@@ -250,14 +317,16 @@ class CrudModel extends CI_Model {
       /*Ya borrada si existía la imagen borramos el usuario y volvemos a la página anterior*/
       $this->db->where('id', $id);
       $this->db->delete('usuarios');
+      $this->session->set_userdata('message', "Usuario eliminado correctamente");                       
       redirect($_SERVER['HTTP_REFERER']);
     }
   public function insertProduct($data){
      if($this->db->insert('productos', $data)){
         //print_r($this->session->userdata('previousGallery'));
         $this->session->set_flashdata('Producto Insertado');
-        redirect( 'create-profile/successful' );
-        redirect($_SERVER['HTTP_REFERER']);     
+        //redirect( 'create-profile/successful' );
+        $message="Producto insertado correctamente";
+        return $message;
        }
        else{
         //redirect(''.$config['base_url'].'administrador/CrudMenu');
@@ -276,7 +345,8 @@ public function updateProduct($data){
        $this->db->where('id', $data['id']);     
        
        if($this->db->update('productos', $data)){                      
-           redirect($_SERVER['HTTP_REFERER']);
+           $message="Producto actualizado correctamente";
+           return $message;
        }                
        else{
         //redirect(''.$config['base_url'].'administrador/CrudMenu');
@@ -296,7 +366,8 @@ public function deleteProduct($id){
       $this->db->where('id', $id);
       $this->db->delete('productos');
           
-      redirect($_SERVER['HTTP_REFERER']);
+       $message="Producto eliminado correctamente";
+       return $message;
     }
 /*public function checkUser($data){
       $this->db->where('id',$data['id']);

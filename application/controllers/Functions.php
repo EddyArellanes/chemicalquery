@@ -2,19 +2,19 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Functions extends CI_Controller {
 public function __construct()
-	{
-		parent::__construct();
-		$this->load->model('CrudModel');
-		include('classes/functions.php');
-	}
+    {
+        parent::__construct();
+        $this->load->model('CrudModel');
+        include('classes/functions.php');
+    }
 
-	
-	public function login(){
-	    $this->load->view('frontend/main');
-		$this->load->model('LoginModel');
+    
+    public function login(){
+        $this->load->view('frontend/main');
+        $this->load->model('LoginModel');
 
-		$datos = array('usuario' => $this->input->post('usuario'),
-					   'contrasena' => $this->input->post('contrasena'));
+        $datos = array('usuario' => $this->input->post('usuario'),
+                       'contrasena' => $this->input->post('contrasena'));
         $this->form_validation->set_rules('usuario', 'Usuario', 'trim|required|xss_clean');    
         $this->form_validation->set_rules('contrasena', 'Contraseña', 'trim|required|xss_clean');
 
@@ -22,187 +22,120 @@ public function __construct()
 
         if (null !==($this->input->post('ingresar'))){
 
-	        if(empty($datos['usuario']) and empty($datos['contrasena'])){
-        		$next = false;
-	        	print "<script type=\"text/javascript\">alert('Debe ingresar su nombre de usuario y contraseña para continuar');</script>";
-	        	$this->load->view('admin_contenido/index');
-	        } elseif(empty($datos['usuario'])){
-	        	$next = false;
-	        	print "<script type=\"text/javascript\">alert('Debe ingresar su nombre de usuario para continuar');</script>";
-	        	$this->load->view('admin_contenido/index');
-	        } elseif(empty($datos['contrasena'])){
-	        	$next = false;
-	        	print "<script type=\"text/javascript\">alert('Debe ingresar su contraseña para continuar');</script>";
-	        	$this->load->view('admin_contenido/index');
-	        }
+            if(empty($datos['usuario']) and empty($datos['contrasena'])){
+                $next = false;
+                print "<script type=\"text/javascript\">alert('Debe ingresar su nombre de usuario y contraseña para continuar');</script>";
+                $this->load->view('admin_contenido/index');
+            } elseif(empty($datos['usuario'])){
+                $next = false;
+                print "<script type=\"text/javascript\">alert('Debe ingresar su nombre de usuario para continuar');</script>";
+                $this->load->view('admin_contenido/index');
+            } elseif(empty($datos['contrasena'])){
+                $next = false;
+                print "<script type=\"text/javascript\">alert('Debe ingresar su contraseña para continuar');</script>";
+                $this->load->view('admin_contenido/index');
+            }
 
-			if($next){
-				if($this->form_validation->run() == FALSE){	
-	        		$this->load->view('frontend/main');
-	        	} else {
-	        		$this->LoginModel->login($datos);
-	        	}
-			}
+            if($next){
+                if($this->form_validation->run() == FALSE){ 
+                    $this->load->view('frontend/main');
+                } else {
+                    $this->LoginModel->login($datos);
+                }
+            }
         }
-	}
-	public function logout(){
-		$this->session->sess_destroy();
-		redirect('','refresh');
-	}
+    }
+    public function logout(){
+        $this->session->sess_destroy();
+        redirect('','refresh');
+    }
 
 
+    public function refreshFunction(){
+        $message['message']=$this->session->userdata('message');                       
 
+        $this->load->view('frontend/administrador',$message);
+    }
+     public function refreshFunction2(){
+        $message['message']="Usuario actualizado con éxito";                       
 
-	public function insertUser(){
-		$formatoUrl = array(
+        $this->load->view('frontend/perfil',$message);
+    }
+
+    public function insertUser(){
+        $formatoUrl = array(
                         'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ñ' => 'n',
                          'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U', 'Ñ' => 'N', ' ' => '_', '/' => '.',
                          '!'=>'.', ','=>'.','&'=>'.'
                       );
                        
-    	$this->load->helper('path');		
-		$config['upload_path'] = './img/usuarios/';
+        $this->load->helper('path');        
+        $config['upload_path'] = './img/usuarios/';
         $config['allowed_types'] = "gif|jpg|jpeg|png";
         $config['max_size'] = "2097152"; //2 megabytes
-    	
-    	
-    		
-    		$data=[];
+        
+        
+            
+            $data=[];
 
-    		
-    		if($this->input->post('nombre')!=""){
-    			$data['nombre']=htmlspecialchars($this->input->post('nombre'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('apellidos')!=""){
-    			$data['apellidos']=htmlspecialchars($this->input->post('apellidos'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('usuario')!=""){
-    			$data['usuario']=htmlspecialchars($this->input->post('usuario'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('tipoCuenta')!=""){
-    			$data['tipoCuenta']=htmlspecialchars($this->input->post('tipoCuenta'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('numeroCuenta')!=""){
-    			$data['numeroCuenta']=htmlspecialchars($this->input->post('numeroCuenta'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('permisos')!=""){
-    			$data['permisos']=htmlspecialchars($this->input->post('permisos'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('contrasena')!=""){
-    			$password=htmlspecialchars($this->input->post('contrasena'));
-                $data['contrasenaToValidate']=$password;
-    			$passwordEncrypt=crypt_pass($password);
-    			$data['contrasena']=$passwordEncrypt;
-    			//print_r($data);
-    		}
-    		if (!empty($_FILES['imagen']['name'])){
-			 	$config['filename']= str_replace(array_keys($formatoUrl), array_values($formatoUrl), $_FILES['imagen']['name']);
-			 		    	
-				if($this->load->library('upload', $config)){
-					if (!$this->upload->do_upload('imagen')){
-						//si hay error
-						print "<script type=\"text/javascript\">alert('Tipo de archivo incorrecto');</script>";
-						//redirect($_SERVER['HTTP_REFERER']);
-					}
-					else{
-						echo "subida";
-						$data['imagen']=$config['filename'];
-    				
-					}  
-				}
-			}
-			
-	    	$this->CrudModel->insertUser($data);  	
-	}
-	public function checkUser(){
-		$data['id']=$this->uri->segment(3);
-		$data = $this->CrudModel->checkUser($data);		
-		echo json_encode($data) ; 		
-		
-	}
-	public function editUser(){
-			$formatoUrl = array(
-                        'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ñ' => 'n',
-                         'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U', 'Ñ' => 'N', ' ' => '_', '/' => '.',
-                         '!'=>'.', ','=>'.','&'=>'.'
-                      );		
-    	$this->load->helper('path');		
-		$config['upload_path'] = './img/usuarios';
-        $config['allowed_types'] = "gif|jpg|jpeg|png";
-        $config['max_size'] = "2097152"; //2 megabytes
-    	
-    	
-    		$data=[];
-
-    		$data['id']=htmlspecialchars($this->input->post('id'));
-    		if($this->input->post('nombre')!=""){
-    			$data['nombre']=htmlspecialchars($this->input->post('nombre'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('apellidos')!=""){
-    			$data['apellidos']=htmlspecialchars($this->input->post('apellidos'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('usuario')!=""){
-    			$data['usuario']=htmlspecialchars($this->input->post('usuario'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('tipoCuenta')!=""){
-    			$data['tipoCuenta']=htmlspecialchars($this->input->post('tipoCuenta'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('numeroCuenta')!=""){
-    			$data['numeroCuenta']=htmlspecialchars($this->input->post('numeroCuenta'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('permisos')!=""){
-    			$data['permisos']=htmlspecialchars($this->input->post('permisos'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('contrasena')!=""){
-    			$password=htmlspecialchars($this->input->post('contrasena'));
-                $data['contrasenaToValidate']=$password;
-    			$passwordEncrypt=crypt_pass($password);
-    			$data['contrasena']=$passwordEncrypt;
-    			//print_r($data);
-    		}
-	    	if (!empty($_FILES['imagen']['name'])){
-			 	$config['filename']= str_replace(array_keys($formatoUrl), array_values($formatoUrl), $_FILES['imagen']['name']);
-			 	$imagenOld = $this->input->post('imagenOld');
-			 	if (!empty($imagenOld)){
-					$carpeta = './img/usuarios/';
-				       if(file_exists($carpeta.$imagenOld)){
-				            unlink($carpeta.$imagenOld);
-				        }
-				}
-				if($this->load->library('upload', $config)){
-					if (!$this->upload->do_upload('imagen')){
-						//si hay error
-						print "<script type=\"text/javascript\">alert('Tipo de archivo incorrecto');</script>";
-						//redirect($_SERVER['HTTP_REFERER']);
-					}
-					else{
-						echo "subida";
-						$data['imagen']=$config['filename'];
-    				
-					}  
-				}
-			}
-	    		$this->CrudModel->editUser($data);  	
-	}
-
-
-	public function deleteUser(){  		 
-		 $id = $this->uri->segment(3);
-    	 $this->CrudModel->deleteUser($id);    
+            
+            if($this->input->post('nombre')!=""){
+                $data['nombre']=htmlspecialchars($this->input->post('nombre'));
+                //print_r($data);
+            }
+            if($this->input->post('apellidos')!=""){
+                $data['apellidos']=htmlspecialchars($this->input->post('apellidos'));
+                //print_r($data);
+            }
+            if($this->input->post('usuario')!=""){
+                $data['usuario']=htmlspecialchars($this->input->post('usuario'));
+                //print_r($data);
+            }
+            if($this->input->post('tipoCuenta')!=""){
+                $data['tipoCuenta']=htmlspecialchars($this->input->post('tipoCuenta'));
+                //print_r($data);
+            }
+            if($this->input->post('numeroCuenta')!=""){
+                $data['numeroCuenta']=htmlspecialchars($this->input->post('numeroCuenta'));
+                //print_r($data);
+            }
+            if($this->input->post('permisos')!=""){
+                $data['permisos']=htmlspecialchars($this->input->post('permisos'));
+                //print_r($data);
+            }
+            if($this->input->post('contrasena')!=""){
+                $password=htmlspecialchars($this->input->post('contrasena'));
+                $passwordToValidate['contrasenaToValidate']=$password;
+                $passwordEncrypt=crypt_pass($password);
+                $data['contrasena']=$passwordEncrypt;
+                //print_r($data);
+            }
+            if (!empty($_FILES['imagen']['name'])){
+                $config['filename']= str_replace(array_keys($formatoUrl), array_values($formatoUrl), $_FILES['imagen']['name']);
+                            
+                if($this->load->library('upload', $config)){
+                    if (!$this->upload->do_upload('imagen')){
+                        //si hay error
+                        print "<script type=\"text/javascript\">alert('Tipo de archivo incorrecto');</script>";
+                        //redirect($_SERVER['HTTP_REFERER']);
+                    }
+                    else{
+                        echo "subida";
+                        $data['imagen']=$config['filename'];
+                    
+                    }  
+                }
+            }
+            
+            $this->CrudModel->insertUser($data,$passwordToValidate);    
     }
-    public function editProfile(){
+    public function checkUser(){
+        $data['id']=$this->uri->segment(3);
+        $data = $this->CrudModel->checkUser($data);     
+        echo json_encode($data) ;       
+        
+    }
+    public function editUser(){
             $formatoUrl = array(
                         'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ñ' => 'n',
                          'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U', 'Ñ' => 'N', ' ' => '_', '/' => '.',
@@ -272,113 +205,196 @@ public function __construct()
             }
                 $this->CrudModel->editUser($data);      
     }
+
+
+    public function deleteUser(){        
+         $id = $this->uri->segment(3);
+         $this->CrudModel->deleteUser($id);    
+         $message['message']=$this->session->userdata('message');
+         $this->load->view('frontend/administrador',$message);
+    }
+    public function editProfile(){
+            $formatoUrl = array(
+                        'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ñ' => 'n',
+                         'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U', 'Ñ' => 'N', ' ' => '_', '/' => '.',
+                         '!'=>'.', ','=>'.','&'=>'.'
+                      );        
+        $this->load->helper('path');        
+        $config['upload_path'] = './img/usuarios';
+        $config['allowed_types'] = "gif|jpg|jpeg|png";
+        $config['max_size'] = "2097152"; //2 megabytes
+        
+        
+            $data=[];
+
+            $data['id']=htmlspecialchars($this->input->post('id'));
+            if($this->input->post('nombre')!=""){
+                $data['nombre']=htmlspecialchars($this->input->post('nombre'));
+                //print_r($data);
+            }
+            if($this->input->post('apellidos')!=""){
+                $data['apellidos']=htmlspecialchars($this->input->post('apellidos'));
+                //print_r($data);
+            }
+            if($this->input->post('usuario')!=""){
+                $data['usuario']=htmlspecialchars($this->input->post('usuario'));
+                //print_r($data);
+            }
+            if($this->input->post('tipoCuenta')!=""){
+                $data['tipoCuenta']=htmlspecialchars($this->input->post('tipoCuenta'));
+                //print_r($data);
+            }
+            if($this->input->post('numeroCuenta')!=""){
+                $data['numeroCuenta']=htmlspecialchars($this->input->post('numeroCuenta'));
+                //print_r($data);
+            }
+            if($this->input->post('permisos')!=""){
+                $data['permisos']=htmlspecialchars($this->input->post('permisos'));
+                //print_r($data);
+            }
+            if($this->input->post('contrasena')!=""){
+                $password=htmlspecialchars($this->input->post('contrasena'));
+                $data['contrasenaToValidate']=$password;
+                $passwordEncrypt=crypt_pass($password);
+                $data['contrasena']=$passwordEncrypt;
+                //print_r($data);
+            }
+            if (!empty($_FILES['imagen']['name'])){
+                $config['filename']= str_replace(array_keys($formatoUrl), array_values($formatoUrl), $_FILES['imagen']['name']);
+                $imagenOld = $this->input->post('imagenOld');
+                if (!empty($imagenOld)){
+                    $carpeta = './img/usuarios/';
+                       if(file_exists($carpeta.$imagenOld)){
+                            unlink($carpeta.$imagenOld);
+                        }
+                }
+                if($this->load->library('upload', $config)){
+                    if (!$this->upload->do_upload('imagen')){
+                        //si hay error
+                        print "<script type=\"text/javascript\">alert('Tipo de archivo incorrecto');</script>";
+                        //redirect($_SERVER['HTTP_REFERER']);
+                    }
+                    else{
+                        echo "subida";
+                        $data['imagen']=$config['filename'];
+                    
+                    }  
+                }
+            }
+
+                $this->CrudModel->editUser($data);      
+                $message['message']="Actualizado Correctamente";
+                $this->load->view('frontend/perfil',$message);
+    }
     public function insertProduct(){
-		$formatoUrl = array(
+        $formatoUrl = array(
                         'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ñ' => 'n',
                          'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U', 'Ñ' => 'N', ' ' => '_', '/' => '.',
                          '!'=>'.', ','=>'.','&'=>'.'
                       );
                        
-    	$this->load->helper('path');		
-		$config['upload_path'] = './img/productos/';
+        $this->load->helper('path');        
+        $config['upload_path'] = './img/productos/';
         $config['allowed_types'] = "gif|jpg|jpeg|png";
         $config['max_size'] = "2097152"; //2 megabytes
-    	
-    	
-    		
-    		$data=[];
+        
+        
+            
+            $data=[];
 
-    		
-    		if($this->input->post('nombre')!=""){
-    			$data['nombre']=htmlspecialchars($this->input->post('nombre'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('categoria')!=""){
-    			$data['categoria']=htmlspecialchars($this->input->post('categoria'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('descripcion')!=""){
-    			$data['descripcion']=$this->input->post('descripcion');
-    			//print_r($data);
-    		}
-    		if($this->input->post('fisicas')!=""){
-    			$data['fisicas']=$this->input->post('fisicas');
-    			//print_r($data);
-    		}
-    		if($this->input->post('quimicas')!=""){
-    			$data['quimicas']=$this->input->post('quimicas');
-    			//print_r($data);
-    		}
-    		if($this->input->post('termodinamicas')!=""){
-    			$data['termodinamicas']=$this->input->post('termodinamicas');
-    			//print_r($data);
-    		}
-    		if (!empty($_FILES['imagen']['name'])){
-			 	$config['filename']= str_replace(array_keys($formatoUrl), array_values($formatoUrl), $_FILES['imagen']['name']);
-			 		    	
-				if($this->load->library('upload', $config)){
-					if (!$this->upload->do_upload('imagen')){
-						//si hay error
-						print "<script type=\"text/javascript\">alert('Tipo de archivo incorrecto');</script>";
-						//redirect($_SERVER['HTTP_REFERER']);
-					}
-					else{
-						echo "subida";
-						$data['imagen']=$config['filename'];
-    				
-					}  
-				}
-			}
-    		//print_r($data);
-	    	$this->CrudModel->insertProduct($data);  	
-	}
-	public function checkProduct(){
-		$data['id']=$this->uri->segment(3);
-		$data = $this->CrudModel->checkProduct($data);		
-		echo json_encode($data) ; 		
-		
-	}
-	public function updateProduct(){	
-		$formatoUrl = array(
+            
+            if($this->input->post('nombre')!=""){
+                $data['nombre']=htmlspecialchars($this->input->post('nombre'));
+                //print_r($data);
+            }
+            if($this->input->post('categoria')!=""){
+                $data['categoria']=htmlspecialchars($this->input->post('categoria'));
+                //print_r($data);
+            }
+            if($this->input->post('descripcion')!=""){
+                $data['descripcion']=$this->input->post('descripcion');
+                //print_r($data);
+            }
+            if($this->input->post('fisicas')!=""){
+                $data['fisicas']=$this->input->post('fisicas');
+                //print_r($data);
+            }
+            if($this->input->post('quimicas')!=""){
+                $data['quimicas']=$this->input->post('quimicas');
+                //print_r($data);
+            }
+            if($this->input->post('termodinamicas')!=""){
+                $data['termodinamicas']=$this->input->post('termodinamicas');
+                //print_r($data);
+            }
+            if (!empty($_FILES['imagen']['name'])){
+                $config['filename']= str_replace(array_keys($formatoUrl), array_values($formatoUrl), $_FILES['imagen']['name']);
+                            
+                if($this->load->library('upload', $config)){
+                    if (!$this->upload->do_upload('imagen')){
+                        //si hay error
+                        print "<script type=\"text/javascript\">alert('Tipo de archivo incorrecto');</script>";
+                        //redirect($_SERVER['HTTP_REFERER']);
+                    }
+                    else{
+                        echo "subida";
+                        $data['imagen']=$config['filename'];
+                    
+                    }  
+                }
+            }
+            
+            $allProducts['message']=$this->CrudModel->insertProduct($data);
+            $allProducts['allProducts']= $this->CrudModel->allProducts();
+            $this->load->view('frontend/productos',$allProducts);
+    }
+    public function checkProduct(){
+        $data['id']=$this->uri->segment(3);
+        $data = $this->CrudModel->checkProduct($data);      
+        echo json_encode($data) ;       
+        
+    }
+    public function updateProduct(){    
+        $formatoUrl = array(
                         'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ñ' => 'n',
                          'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U', 'Ñ' => 'N', ' ' => '_', '/' => '.',
                          '!'=>'.', ','=>'.','&'=>'.'
-                      );	
+                      );    
 
-    	$this->load->helper('path');		
-		$config['upload_path'] = './img/productos/';
+        $this->load->helper('path');        
+        $config['upload_path'] = './img/productos/';
         $config['allowed_types'] = "gif|jpg|jpeg|png";
         $config['max_size'] = "2097152"; //2 megabytes
-    	
-    	
-    		$data=[];
+        
+        
+            $data=[];
 
-    		$data['id']=htmlspecialchars($this->input->post('id'));
-    			if($this->input->post('nombre')!=""){
-    			$data['nombre']=htmlspecialchars($this->input->post('nombre'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('categoria')!=""){
-    			$data['categoria']=htmlspecialchars($this->input->post('categoria'));
-    			//print_r($data);
-    		}
-    		if($this->input->post('descripcion')!=""){
-    			$data['descripcion']=$this->input->post('descripcion');
-    			//print_r($data);
-    		}
-    		if($this->input->post('fisicas')!=""){
-    			$data['fisicas']=$this->input->post('fisicas');
-    			//print_r($data);
-    		}
-    		if($this->input->post('quimicas')!=""){
-    			$data['quimicas']=$this->input->post('quimicas');
-    			//print_r($data);
-    		}
-    		if($this->input->post('termodinamicas')!=""){
-    			$data['termodinamicas']=$this->input->post('termodinamicas');
-    			//print_r($data);
-    		}
-	    	if (!empty($_FILES['imagen']['name'])){
+            $data['id']=htmlspecialchars($this->input->post('id'));
+                if($this->input->post('nombre')!=""){
+                $data['nombre']=htmlspecialchars($this->input->post('nombre'));
+                //print_r($data);
+            }
+            if($this->input->post('categoria')!=""){
+                $data['categoria']=htmlspecialchars($this->input->post('categoria'));
+                //print_r($data);
+            }
+            if($this->input->post('descripcion')!=""){
+                $data['descripcion']=$this->input->post('descripcion');
+                //print_r($data);
+            }
+            if($this->input->post('fisicas')!=""){
+                $data['fisicas']=$this->input->post('fisicas');
+                //print_r($data);
+            }
+            if($this->input->post('quimicas')!=""){
+                $data['quimicas']=$this->input->post('quimicas');
+                //print_r($data);
+            }
+            if($this->input->post('termodinamicas')!=""){
+                $data['termodinamicas']=$this->input->post('termodinamicas');
+                //print_r($data);
+            }
+            if (!empty($_FILES['imagen']['name'])){
                 $config['filename']= str_replace(array_keys($formatoUrl), array_values($formatoUrl), $_FILES['imagen']['name']);
                 $imagenOld = $this->input->post('imagenOld');
                 if (!empty($imagenOld)){
@@ -400,21 +416,41 @@ public function __construct()
                     }  
                 }
             }
-	    	$this->CrudModel->updateProduct($data);  	
-	}
-	public function deleteProduct(){  		 
-		$id = $this->uri->segment(3);
-    	$this->CrudModel->deleteProduct($id);    
+            $allProducts['message']=$this->CrudModel->updateProduct($data);     
+            $allProducts['allProducts']= $this->CrudModel->allProducts();
+            $this->load->view('frontend/productos',$allProducts);
+
     }
-    public function searchProduct(){  		 
-		$search = $this->input->post('search');
-		redirect($this->config->config['base_url']."ChemicalQuery/Productos/Buscar/".$search);
-    	
+    public function deleteProduct(){         
+        $id = $this->uri->segment(3);
+        $allProducts['message']=$this->CrudModel->deleteProduct($id);    
+        $allProducts['allProducts']= $this->CrudModel->allProducts();
+        $this->load->view('frontend/productos',$allProducts);
     }
-     public function categoryProduct(){  		 
-		$categoria = $this->input->post('categoria');
-		redirect($this->config->config['base_url']."ChemicalQuery/Productos/Categoria/".$categoria);
-    	
+    public function searchProduct(){         
+      if($this->input->post('search')){
+        $data['product']=$this->CrudModel->findProduct($this->input->post('search'));
+        if($data['product']!=""){           
+            $this->load->view("frontend/productos",$data);
+            
+        }
+        else{
+            $data['empty']="Vacio";            
+            $this->load->view("frontend/productos",$data);    
+        }
+
+      }
+      else{
+        
+        redirect($this->config->config['base_url']."ChemicalQuery/Productos/Buscar/".$search);
+
+      }
+    }
+     public function categoryProduct(){          
+        $category = $this->input->post('categoria');
+        $data['category']=$this->CrudModel->findCategory($category);
+        $this->load->view('frontend/productos',$data);
+        
     }
     public function recoverPassword(){
         $data['usuario']=htmlspecialchars($this->input->post('usuario'));

@@ -53,4 +53,6 @@ $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 $route['Thanks']='SendMessage/contacto';
+$routes['Productos']='Functions/insertProduct';
+$routes['Categories']='ChemicalQuery/Productos';
 //$route['Recuperado']='Functions/renewPassword';

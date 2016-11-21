@@ -30,9 +30,9 @@
         <li><a href="<?php print base_url();?>ChemicalQuery/Contacto">Contacto</a></li>
            <!--Revisar datos de Usuario-->   
         <?php if(null!=$this->session->userdata('imagen')){?>
-        <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img width="50px" height="50px" style="border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/usuarios/<?php print $this->session->userdata('imagen')?>">
+        <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img style="border-radius:10%;min-width:25px;max-width:25px;max-height:25px;" class="responsive-img" src="<?php print base_url();?>img/usuarios/<?php print $this->session->userdata('imagen')?>">
         <?php }else{?>
-         <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img width="50px" height="50px" style="border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/noimg.png">
+         <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img  style="border-radius:10%;min-width:25px;max-width:25px;max-height:25px;" class="responsive-img" src="<?php print base_url();?>img/noimg.png">
           <?php }?>
         <?php print $this->session->userdata('usuario')?></a></li>
         <!--Revisar datos de Usuario FIN-->  
@@ -50,9 +50,9 @@
         <li><a href="<?php print base_url();?>ChemicalQuery/Contacto">Contacto</a></li>
            <!--Revisar datos de Usuario-->   
         <?php if(null!=$this->session->userdata('imagen')){?>
-        <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img width="50px" height="50px" style="border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/usuarios/<?php print $this->session->userdata('imagen')?>">
+        <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img style="border-radius:10%;min-width:25px;max-width:25px;max-height:25px;"class="responsive-img" src="<?php print base_url();?>img/usuarios/<?php print $this->session->userdata('imagen')?>">
         <?php }else{?>
-         <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img width="50px" height="50px" style="border-radius:10%;" class="responsive-img" src="<?php print base_url();?>img/noimg.png">
+         <li><a href="<?php print base_url();?>ChemicalQuery/Perfil"><img style="border-radius:10%;min-width:25px;max-width:25px;max-height:25px;" class="responsive-img" src="<?php print base_url();?>img/noimg.png">
           <?php }?>
         <?php print $this->session->userdata('usuario')?></a></li>
         <!--Revisar datos de Usuario FIN-->  

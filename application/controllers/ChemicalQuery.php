@@ -27,7 +27,8 @@ public function __construct()
 		}
 	}
 	public function Productos(){
-		$this->load->view('frontend/productos');
+		$allProducts['allProducts']= $this->CrudModel->allProducts();
+		$this->load->view('frontend/productos',$allProducts);
 	}
 	public function Producto(){
 		$this->load->view('frontend/producto');
